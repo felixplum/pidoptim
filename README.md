@@ -10,7 +10,7 @@ Demotool
 - Output: t, u, y
 - R/W nach .csv (von/zu Numpy)
 
-## ModellFitter:
+## ModellFitter [WIP Felix]:
 
 - generateModel(coeff, n_order) --> generiert Modellfunktion y_k = f(y_k_-1 , .. u_k, params), welche fuer Fitting und Validierung verwendet wird
 	-	Zuerst: ARX-Modell; spaeter neurales Netz o.ae.
