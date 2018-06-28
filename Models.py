@@ -23,17 +23,14 @@ class Siso_Model(object):
         self.y_ref=y_ref
         self.e_last = 0
         self.u_min = -5000
-        self.u_max = 5000
-        
-      
-        
+        self.u_max = 5000      
         
     def integrate(self,y0,t0,tf,delta_t):
         self.dt=delta_t
         ode_inte = ode(self.f).set_integrator('vode', method='adams', with_jacobian=False,max_step=delta_t)
         ode_inte.set_initial_value(y0, t0)
         self.init_error(ode_inte.t,ode_inte.y)
-        self.PID_Control(ode_inte.y[self.num_dim])
+        self.update_pid_control(ode_inte.y[self.num_dim])
     
         time=np.array([ode_inte.t])
         x=np.array([ode_inte.y])
@@ -117,12 +114,8 @@ class LIN_Siso_Model(Siso_Model):
     def f(self,t,x):        
         x_s=x[0:self.num_dim]
         #e_i=x[self.num_dim]  
-        
         x_dot = self.A.dot(x_s) + np.transpose(self.B*self.u)       
-        
         return np.concatenate((x_dot,[[self.e]]),axis=1)
-
-     
 
     def __init__(self,y_ref,PID_PARA,lin_model_para):
         
@@ -161,41 +154,9 @@ def y_ref_sin(t):
 
 def y_ref_step(t):
     if t>.1:
-        return 1
+        return 1.
     else:
-        return 0
-
-lin_model_para=dict()
-lin_model_para['name']  = 'model_1'
-lin_model_para['A']     = np.matrix([[0,1],[-2,-3]])
-lin_model_para['B']     = np.matrix([[0],[1]])
-lin_model_para['C']     = np.matrix([[2,0]])
-lin_model_para['D']     = 0
-    
-
-PID_PARA=dict()
-PID_PARA['P']=10
-PID_PARA['I']=5
-PID_PARA['D']=1
-lin = LIN_Siso_Model(y_ref=y_ref_step,PID_PARA=PID_PARA,lin_model_para=lin_model_para) 
-#lin.integrate(y0=[0,0,0],t0=0,tf=10,delta_t=0.001)
-
-lin_model_para=dict()
-lin_model_para['name']  = 'model_2'
-lin_model_para['A']     = np.matrix([[0,1,0],[0,0,1],[-1,-1,-1]])
-lin_model_para['B']     = np.matrix([[0],[0],[1]])
-lin_model_para['C']     = np.matrix([[1,1,1]])
-lin_model_para['D']     = 0
-    
-
-PID_PARA=dict()
-PID_PARA['P']=10
-PID_PARA['I']=5
-PID_PARA['D']=1
-lin = LIN_Siso_Model(y_ref=y_ref_step,PID_PARA=PID_PARA,lin_model_para=lin_model_para) 
-lin.integrate(y0=[1,1,1,0],t0=0,tf=5,delta_t=0.001)
-
-
+        return 0.
 
 
 
