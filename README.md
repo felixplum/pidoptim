@@ -13,7 +13,7 @@ Demotool
 ## ModellFitter:
 ----(Felix 26.06.2018)----
 - [x] Fitting of closed loop model
-- [] Fitting of open loop model + PID params
+- [ ] Fitting of open loop model + PID params
 
 <img src="https://devfiles.syno-iq.de/s/iArmqping92Txds/preview" alt="drawing" width="300px"/>
 <img src="https://devfiles.syno-iq.de/s/SY4nYNMXiFX4kme/preview" alt="drawing" width="300px"/>
