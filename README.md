@@ -18,6 +18,9 @@ Demotool
  	- Wird an Solver gegeben; ruft intern modelfct. auf
 - Modell als Casadiexpressions (Vorschlag Felix, to be discussed)
 
+![alt text](https://devfiles.syno-iq.de/s/iArmqping92Txds "model1")
+
+
 ## PidFitter
 
 - Gegeben Modell (+Integrator), Referenztrajektorien, finde Kp, Kd, Ki, sodass Kosten minimal
