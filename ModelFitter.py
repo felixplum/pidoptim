@@ -46,13 +46,3 @@ class ModelFitter:
 		def eval_fct(u_prev, y_prev):
 			return self.predict(u_prev, y_prev, res[:u_coeff.shape[0]], res[u_coeff.shape[0]:])
 		return eval_fct
-
-	# def __call__(self):
-
-a = ModelFitter(1, 3) # input lag / output lag
-u_test = np.ones(100)
-y_test = np.arange(100)
-model = a.getFittedModel(u_test, y_test)
-print("Prediction is: ", model(np.array([1, 2]), np.array([1, 2, 3])))
-# ModelFitter(data, model_order)
-# model.fit() returns params
