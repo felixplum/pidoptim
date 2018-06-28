@@ -18,7 +18,7 @@ Demotool
  	- Wird an Solver gegeben; ruft intern modelfct. auf
 - Modell als Casadiexpressions (Vorschlag Felix, to be discussed)
 
-![alt text](https://devfiles.syno-iq.de/s/iArmqping92Txds/preview "model1")
+![alt text](https://devfiles.syno-iq.de/s/iArmqping92Txds/preview =250x)
 
 
 ## PidFitter
