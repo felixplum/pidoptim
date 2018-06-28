@@ -22,6 +22,8 @@ class Siso_Model(object):
         self.u = 0
         self.y_ref=y_ref
         self.e_last = 0
+        self.u_min = -5000
+        self.u_max = 5000
         
       
         
@@ -46,7 +48,7 @@ class Siso_Model(object):
         while ode_inte.successful() and ode_inte.t < tf:
             ode_inte.integrate(ode_inte.t+delta_t)
             self.update_error(ode_inte.t,ode_inte.y)
-            self.PID_Control(ode_inte.y[self.num_dim])
+            self.update_pid_control(ode_inte.y[self.num_dim])
             
             time=np.append(time,[ode_inte.t],axis=0)
             x=np.append(x,[ode_inte.y],axis=0)
@@ -66,11 +68,7 @@ class Siso_Model(object):
             for i in range(0,len(time)):
                 writer.writerow({'t':time[i],'u':u[i],'y':y[i],'r':y_ref[i]})    
 
-            
-            
-          
-       
-        
+
         #print(plt.get_legend_handles_labels())
     def init_error(self,t,x):
         x_s=x[0:self.num_dim]
@@ -85,12 +83,10 @@ class Siso_Model(object):
         #self.e_dot = (self.get_y(x_s) - self.e_last)/self.dt 
         #self.e_last = self.get_y(x_s)
         
-    def PID_Control(self,e_i):
+    def update_pid_control(self,e_i):
         u = self.KP*self.e+e_i*self.KI+self.KD*self.e_dot
-        if u < 5000 and u>-5000:
-            self.u=u
-        else:
-            self.u=np.sign(u)*5000
+        self.u = np.clip(u, self.u_min, self.u_max)
+
     def gen_plot(self,time,x,u,e,y,y_ref):
         plt.figure(1)
         plt.subplot(221)
@@ -135,9 +131,6 @@ class LIN_Siso_Model(Siso_Model):
         self.C=lin_model_para['C']    
         self.D=lin_model_para['D']    
         self.num_dim=self.A.shape[0]
-        
-        
-             
               
         super(LIN_Siso_Model, self).__init__(y_ref,PID_PARA,lin_model_para['name'])
         
@@ -148,23 +141,15 @@ class NONLIN_Siso_Model(Siso_Model):
     def f(self,t,x,arg):        
         x_s=x[0:self.num_dim]
         #e_i=x[self.num_dim]  
-        
         x_dot = self.A.dot(x_s) + np.transpose(B*self.u)       
         
         return np.concatenate((x_dot,[[self.e]]),axis=1)
-
-     
 
     def __init__(self,num_dim,x_dot,y_fun,y_ref,PID_PARA):
             
         self.x_dot=x_dot
         self.y_fun=y_fun
-        self.num_dim=num_dim      
-       
-        
-        
-            
-              
+        self.num_dim=num_dim        
         super(LIN_Siso_Model, self).__init__(y_ref,PID_PARA)        
         
         
