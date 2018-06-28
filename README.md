@@ -17,7 +17,7 @@ Demotool
 - [x] Fitting of closed loop model
 - [ ] Fitting of open loop model + PID params
 
-### Fitted closed loop model fct.: 
+*Fitted closed loop model fct.* 
 <img src="https://devfiles.syno-iq.de/s/iArmqping92Txds/preview" width="200px"/> <img src="https://devfiles.syno-iq.de/s/SY4nYNMXiFX4kme/preview" width="200px"/> <img src="https://devfiles.syno-iq.de/s/ZGdmWAgkQRjXRip/preview" width="200px"/>
 
 ## PidFitter
