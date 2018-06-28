@@ -1,5 +1,6 @@
 import casadi as ca
 import numpy as np 
+import os
 
 class ModelFitter: 
 	def __init__(self, n_input_lag, n_output_lag):
@@ -32,14 +33,18 @@ class ModelFitter:
 
 
 	def getFittedModel(self,  u_in, y_out):
-		y_coeff = ca.MX.sym('y_c', self.n_output_lag)
-		u_coeff = ca.MX.sym('u_c', self.n_input_lag+1) # include current input
+		y_coeff = ca.SX.sym('y_c', self.n_output_lag)
+		u_coeff = ca.SX.sym('u_c', self.n_input_lag+1) # include current input
 		params = ca.vertcat(u_coeff, y_coeff)
 		obj = self.getObjective(u_in, y_out, u_coeff, y_coeff)
 		# set up solver
 		nlp = {'x': params, 'f': obj}
 		solver_opts = {'ipopt': {'print_level': 0, 'linear_solver': 'mumps'}, 'print_time' : 0}
 		solver = ca.nlpsol('solver', 'ipopt', nlp, solver_opts)
+		# solver.generate_dependencies('nlp.c')
+		# os.system("gcc -fPIC -shared nlp.c -o nlp.so")
+		# abspath = os.path.abspath('nlp.so')
+		solver = ca.nlpsol('solver', 'ipopt', abspath, solver_opts)
 		x0 = np.zeros(params.shape[0])
 		res = np.array(solver(x0=x0)['x'])
 		print(res) #
