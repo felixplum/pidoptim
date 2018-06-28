@@ -17,21 +17,7 @@ Demotool
 - [x] Fitting of closed loop model
 - [ ] Fitting of open loop model + PID params
 
-<div class="row">
-  <div class="column">
-    <img src="https://devfiles.syno-iq.de/s/iArmqping92Txds/preview" alt="Snow" style="width:200px">
-  </div>
-  <div class="column">
-    <img src="https://devfiles.syno-iq.de/s/SY4nYNMXiFX4kme/preview" alt="Forest" style="width:200px">
-  </div>
-  <div class="column">
-    <img src="https://devfiles.syno-iq.de/s/ZGdmWAgkQRjXRip/preview" alt="Mountains" style="width:200px">
-  </div>
-</div>
-
-<img src="https://devfiles.syno-iq.de/s/iArmqping92Txds/preview" alt="drawing" width="300px"/>
-<img src="https://devfiles.syno-iq.de/s/SY4nYNMXiFX4kme/preview" alt="drawing" width="300px"/>
-<img src="https://devfiles.syno-iq.de/s/ZGdmWAgkQRjXRip/preview" alt="drawing" width="300px"/>
+<img src="https://devfiles.syno-iq.de/s/iArmqping92Txds/preview" width="300px"/> <img src="https://devfiles.syno-iq.de/s/SY4nYNMXiFX4kme/preview" width="300px"/> <img src="https://devfiles.syno-iq.de/s/ZGdmWAgkQRjXRip/preview" width="300px"/>
 
 ## PidFitter
 
