@@ -12,11 +12,8 @@ Demotool
 
 ## ModellFitter:
 ----(Felix 26.06.2018)----
-- generateModel(coeff, n_order) --> generiert Modellfunktion y_k = f(y_k_-1 , .. u_k, params), welche fuer Fitting und Validierung verwendet wird
-	-	Zuerst: ARX-Modell; spaeter neurales Netz o.ae.
-- generateObjective(u_in, y_out, params)
- 	- Wird an Solver gegeben; ruft intern modelfct. auf
-- Modell als Casadiexpressions (Vorschlag Felix, to be discussed)
+- [x] Fitting of closed loop model
+- [] Fitting of open loop model + PID params
 
 <img src="https://devfiles.syno-iq.de/s/iArmqping92Txds/preview" alt="drawing" width="300px"/>
 <img src="https://devfiles.syno-iq.de/s/SY4nYNMXiFX4kme/preview" alt="drawing" width="300px"/>
