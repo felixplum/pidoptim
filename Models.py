@@ -4,14 +4,6 @@ import matplotlib.pyplot as plt
 from scipy.integrate import ode
 import csv
 
-from csv_rw import read_model_csv
-import os
-
-#cwd = os.path.dirname(__file__)
-#print(cwd)
-#t,u,y = read_model_csv('D:\\Syno\\PID-Tuner\\ModelTesting\\model_1.csv')
-
-
 
 class Siso_Model(object):
     def __init__(self,y_ref,PID_PARA,name):
