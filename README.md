@@ -19,6 +19,7 @@ Demotool
 - Modell als Casadiexpressions (Vorschlag Felix, to be discussed)
 
 ![alt text](https://devfiles.syno-iq.de/s/iArmqping92Txds/preview =250x)
+<img src="https://devfiles.syno-iq.de/s/iArmqping92Txds/preview" alt="drawing" width="200px"/>
 
 
 ## PidFitter
