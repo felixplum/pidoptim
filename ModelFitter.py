@@ -6,9 +6,13 @@ class ModelFitter:
 	def __init__(self, n_input_lag, n_output_lag):
 		self.n_input_lag = n_input_lag
 		self.n_output_lag = n_output_lag
+		self.u_coeff = None
+		self.y_coeff = None
 	
-	# reutrns y_k as fct. of unknown coeff.
-	def predict(self, u_prev, y_prev, u_coeff, y_coeff):
+	def predict(self, u_prev, y_prev, u_coeff=None, y_coeff=None):
+		if (u_coeff is None or y_coeff is None):
+			u_coeff = self.u_coeff
+			y_coeff = self.y_coeff
 		assert(y_prev.shape[0] == y_coeff.shape[0])
 		assert(u_prev.shape[0] == u_coeff.shape[0])
 		out = 0
@@ -29,10 +33,11 @@ class ModelFitter:
 			y_pred = self.predict(u_prev, y_prev, u_coeff, y_coeff)
 			error = y_pred - y_out[i]
 			obj += error*error
+		# obj += ca.dot(u_coeff, u_coeff) + 0.0001*ca.dot(y_coeff, y_coeff)
 		return obj
 
 
-	def getFittedModel(self,  u_in, y_out):
+	def fitModel(self,  u_in, y_out):
 		y_coeff = ca.SX.sym('y_c', self.n_output_lag)
 		u_coeff = ca.SX.sym('u_c', self.n_input_lag+1) # include current input
 		params = ca.vertcat(u_coeff, y_coeff)
@@ -44,10 +49,11 @@ class ModelFitter:
 		# solver.generate_dependencies('nlp.c')
 		# os.system("gcc -fPIC -shared nlp.c -o nlp.so")
 		# abspath = os.path.abspath('nlp.so')
-		solver = ca.nlpsol('solver', 'ipopt', abspath, solver_opts)
+		# solver = ca.nlpsol('solver', 'ipopt', abspath, solver_opts)
 		x0 = np.zeros(params.shape[0])
 		res = np.array(solver(x0=x0)['x'])
+		self.u_coeff = res[:u_coeff.shape[0]]
+		self.y_coeff = res[u_coeff.shape[0]:]
 		print(res) #
-		def eval_fct(u_prev, y_prev):
-			return self.predict(u_prev, y_prev, res[:u_coeff.shape[0]], res[u_coeff.shape[0]:])
-		return eval_fct
+		# def eval_fct(u_prev, y_prev):
+		# 	return self.predict(u_prev, y_prev, res[:u_coeff.shape[0]], res[u_coeff.shape[0]:])
