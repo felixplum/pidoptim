@@ -22,19 +22,22 @@ class ModelFitter:
 
 	
 	# reutrns y_k as fct. of unknown coeff.	
-	def predict(self,y_prev,u_prev,u_coeff,y_coeff):
+	def predict(self,y_prev,u_prev,u_coeff,y_coeff,d):
 		out = 0
 		for i in range(0,self.order):
 			out += u_prev[i]*u_coeff[i]
 			out += -y_prev[i]*y_coeff[i]
 
+			out += u_prev[i]*y_coeff[i]*d
+
+		out += u_prev[self.order-1]*d*y_coeff[self.order]
 		out = out/y_coeff[self.order]
 			
 			
 		return out
 	# Set objective based on measured controls and outputs,
 	# depending on optim. variables "params"
-	def getObjective(self,y_out,u_in,u_coeff,y_coeff):
+	def getObjective(self,y_out,u_in,u_coeff,y_coeff,d):
 		obj = 0
 
 		y_prev=[y_out[i] for i in range(0,self.order)]
@@ -47,7 +50,7 @@ class ModelFitter:
 			u_prev=u_in[i-self.order+1:i+1]	
 			
 
-			y_pred = self.predict(y_prev,u_prev,u_coeff,y_coeff)
+			y_pred = self.predict(y_prev,u_prev,u_coeff,y_coeff,d)
 
 			error = y_pred - y_out[i]
 			obj += error*error
@@ -97,7 +100,7 @@ class ModelFitter:
 
 		return coeff
 
-	def get_y_coeff(self,alpha,dt):
+	def get_y_coeff(self,alpha,dt,d):
 		coeff = [0 for i in range(0,self.order+1)]
 		coeff[0] =self.bin_coeff_m[0,0]	
 		for i in range(1,self.order+1):
@@ -107,6 +110,7 @@ class ModelFitter:
 				else:								
 					coeff[i]+=-alpha[self.order-p]*dt**(p)*self.bin_coeff_m[i,p]	
 
+				
 		return coeff
 
 	def get_y_coeff_CL(self,alpha,dt,u_coeff_CL):
@@ -134,12 +138,12 @@ class ModelFitter:
 			y[i]=self.predict2(y[i-len(u_coeff_CL)+1:i],r[i-len(u_coeff_CL):i+1],u_coeff_CL,y_coeff_CL)
 
 		return y
-	def sim(self,y_out,u_in,t):
-		y=[0 for i in range(0,len(u_in))]
+	def sim(self,y_out,u_in,t,d):
+		y=np.array(y_out)
 		#print(len(r),len(u_coeff_CL),len(y_coeff_CL))
 
 		for i in range(len(self.u_coeff),len(u_in)):
-			y[i]=self.predict(y[i-len(self.u_coeff):i],u_in[i-len(self.u_coeff):i+1],self.u_coeff,self.y_coeff)
+			y[i]=self.predict(y[i-len(self.u_coeff):i],u_in[i-len(self.u_coeff):i+1],self.u_coeff,self.y_coeff,d)
 
 		plt.figure(1)
 		plt.subplot(211)
@@ -157,31 +161,72 @@ class ModelFitter:
 
 		alpha = ca.MX.sym('alpha', self.order)
 		beta = ca.MX.sym('beta', self.order) # include current input
-		
+		d = ca.MX.sym('d', 1)
 
-		params = ca.vertcat(alpha, beta)#,PID_coeff)
+		params = ca.vertcat(alpha, beta,d)#,PID_coeff)
 
 		u_coeff=self.get_u_coeff(beta,self.dt)
-		y_coeff=self.get_y_coeff(alpha,self.dt)
+		y_coeff=self.get_y_coeff(alpha,self.dt,d)
 		
 
-		obj = self.getObjective(y_out,u_in,u_coeff,y_coeff)
+		obj = self.getObjective(y_out,u_in,u_coeff,y_coeff,d)
 		# set up solver
 		nlp = {'x': params, 'f': obj}
 		solver_opts = {'ipopt': {'print_level': 0, 'linear_solver': 'mumps'}, 'print_time' : 0}
 		solver = ca.nlpsol('solver', 'ipopt', nlp, solver_opts)
-		x0 = np.zeros(params.shape[0])
+		x0 = np.ones(params.shape[0])
 		res = np.array(solver(x0=x0)['x'])
+		print(res)
+		d=res[self.order+self.order]
 
 		self.poles = res[0:self.order]
-		self.zeros = res[self.order:]
+		self.zeros = res[self.order:self.order+self.order]
 
 		self.u_coeff=self.get_u_coeff(self.zeros,self.dt)
-		self.y_coeff=self.get_y_coeff(self.poles,self.dt)
+		self.y_coeff=self.get_y_coeff(self.poles,self.dt,d)
 
-		print('alphas\n',self.poles)
-		print('betas\n',self.zeros)
-		self.sim(y_out,u_in,t)
+		#string=''
+		#for i in range(0,len(self.poles)):
+	#		string+='a_'+str(i)+' ={:+0.3f}  '.format(self.poles[i][0]) 		
+	#	print(string)
+	#	string=''
+	#	for i in range(0,len(self.zeros)):
+	#		string+='b_'+str(i)+' ={:+0.3f}  '.format(self.zeros[i][0])	
+	#	print(string)
+#
+#		pol=np.ones(len(self.poles)+1)
+#		
+#		pol[1:]=self.zeros[:,0]		
+#		pol=np.roots(pol)
+#		
+#		string= '       '
+
+		
+
+#		for i in range(0,len(pol)):		
+#			if pol[i].imag ==0:
+#				string+='(s{:+.3f})'.format(pol[i].real) 
+#			else:
+#				string+='(s{:+.3f})'.format(pol[i]) 
+#
+#		string+='\nH(s) = ------------------\n'
+#
+#		pol=np.ones(len(self.zeros)+1)
+##		pol[1:]=self.poles[:,0]		
+#		pol=np.roots(pol)
+#		
+#		string+= '       '
+#		for i in range(0,len(pol)):
+#			if pol[i].imag ==0:
+#				string+='(s{:+.3f})'.format(pol[i].real) 
+#			else:
+#				string+='(s{:+.3f})'.format(pol[i]) 
+#		string+='\n'		
+#		print(string)
+#
+		#print('alphas\n',self.poles)
+		#print('betas\n',self.zeros)
+		self.sim(y_out,u_in,t,d)
 		#def eval_fct(r):
 		#	return self.sim_CL(r,u_coeff_CL,y_coeff_CL)
 
