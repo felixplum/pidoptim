@@ -161,7 +161,7 @@ class ModelFitter:
 
 		alpha = ca.MX.sym('alpha', self.order)
 		beta = ca.MX.sym('beta', self.order) # include current input
-		d = ca.MX.sym('d', 1)
+		d =ca.MX.sym('d', 1)
 
 		params = ca.vertcat(alpha, beta,d)#,PID_coeff)
 
